@@ -1,14 +1,30 @@
 import { Button } from "@/components/ui/button.jsx";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet.jsx";
-import { ArrowRight, Computer, Search } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { Link, useNavigation } from "react-router";
+import AuthContext from "@/context/auth-provider.jsx";
+import { Terminal, ArrowRight, Zap, Computer } from "lucide-react";
+import { useContext, useEffect, useRef } from "react";
+import { Link, useNavigate, useNavigation } from "react-router-dom";
+import { LogOut } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import LoadingBar from "react-top-loading-bar";
 import { Input } from "../ui/input";
+import { Search } from "lucide-react";
 
 export default function NavBar() {
-    const loaderRef = useRef(null);
+    const { user, setUser } = useContext(AuthContext);
     const { state: navState } = useNavigation();
+    const loaderRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (navState == "loading") {
@@ -17,6 +33,17 @@ export default function NavBar() {
             loaderRef.current.complete();
         }
     }, [navState]);
+
+    const logout = () => {
+        setUser({
+            id: null,
+            email: null,
+            name: null,
+            token: null,
+            isAuthenticated: false,
+            point: 0,
+        });
+    };
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background dark:bg-background">
@@ -57,18 +84,51 @@ export default function NavBar() {
                             size={20}
                         />
                     </div>
-                    <div className="flex gap-4">
-                        <Button variant="outline" asChild>
-                            <Link to="/login">Login</Link>
-                        </Button>
-                        <Button className="group" asChild>
-                            <Link to="/register">
-                                Register
-                                <ArrowRight className="ml-2 z-10 group-hover:ml-3 duration-200" />
-                            </Link>
-                        </Button>
-                    </div>
-
+                    {!user.isAuthenticated ? (
+                        <div className="flex gap-4">
+                            <Button variant="outline" asChild>
+                                <Link to="/login">Login</Link>
+                            </Button>
+                            <Button className="group" asChild>
+                                <Link to="/register">
+                                    Register
+                                    <ArrowRight className="ml-2 z-10 group-hover:ml-3 duration-200" />
+                                </Link>
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="flex flex-row items-center gap-4">
+                            <AlertDialog>
+                                <AlertDialogTrigger>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="rounded-full"
+                                    >
+                                        <LogOut />
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                            Log Out?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Are you sure you want to log out?
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>
+                                            Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction onClick={logout}>
+                                            Yes, log out
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    )}
                     <Sheet>
                         <SheetTrigger asChild>
                             <Button
