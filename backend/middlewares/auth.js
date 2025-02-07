@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 const redis = createClient({ url: process.env.REDIS_URL });
 redis.connect();
 
-const checkAuth = async (req, res, next) => {
+const checkAuth = async (req, res, next, admin = false) => {
     const { authorization } = req.headers;
     if (!authorization) {
         return res.status(403).json({
@@ -68,6 +68,13 @@ const checkAuth = async (req, res, next) => {
         return res.status(403).json({
             success: false,
             message: "Please login again after password update",
+            data: null,
+        });
+    }
+    if (admin && !user.isAdmin) {
+        return res.status(403).json({
+            success: false,
+            message: "You do not have the required permissions",
             data: null,
         });
     }

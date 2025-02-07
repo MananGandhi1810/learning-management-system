@@ -10,4 +10,8 @@ const validatePassword = (password) => {
     );
 };
 
-export { validateEmail, validatePassword };
+const validateSlug = (slug) => {
+    return /^[a-z0-9-]{3,}$/.test(String(slug).toLowerCase());
+};
+
+export { validateEmail, validatePassword, validateSlug };

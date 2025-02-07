@@ -1,20 +1,63 @@
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-arm64-openssl-1.1.x"]
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-1.1.x"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-  id                String   @id @default(cuid())
-  email             String   @unique
-  name              String?
-  password          String
-  isVerified        Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  passwordUpdatedAt DateTime @default(now())
+    id                String       @id @default(cuid())
+    email             String       @unique
+    name              String?
+    password          String
+    isVerified        Boolean      @default(false)
+    isAdmin           Boolean      @default(false)
+    createdAt         DateTime     @default(now())
+    updatedAt         DateTime     @updatedAt
+    passwordUpdatedAt DateTime     @default(now())
+    courses           CourseUser[]
+}
+
+model Course {
+    id            String       @id @default(cuid())
+    slug          String       @unique
+    thumbnailPath String?
+    title         String
+    description   String
+    price         Int
+    isLaunched    Boolean      @default(false)
+    videos        Video[]
+    users         CourseUser[]
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+
+    @@index([slug])
+}
+
+model Video {
+    id          String   @id @default(cuid())
+    title       String
+    description String
+    path        String
+    duration    Int
+    index       Int
+    course      Course?  @relation(fields: [courseId], references: [id])
+    courseId    String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
+model CourseUser {
+    id       String @id @default(cuid())
+    user     User   @relation(fields: [userId], references: [id])
+    userId   String
+    course   Course @relation(fields: [courseId], references: [id])
+    courseId String
+
+    @@unique([userId, courseId])
+    @@index([userId])
+    @@index([courseId])
 }
