@@ -41,7 +41,7 @@ model Video {
     id          String   @id @default(cuid())
     title       String
     description String
-    path        String
+    url         String
     duration    Int
     index       Int
     course      Course?  @relation(fields: [courseId], references: [id])

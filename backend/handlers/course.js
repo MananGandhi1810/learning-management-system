@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { validateSlug } from "../utils/validators.js";
+import { validateSlug, validateUrl } from "../utils/validators.js";
 
 const prisma = new PrismaClient();
 
@@ -70,4 +70,125 @@ const newCourseHandler = async (req, res) => {
     });
 };
 
-export { getAllCoursesHandler, newCourseHandler };
+const newCourseVideoHandler = async (req, res) => {
+    const { title, description, url, duration, courseId } = req.body;
+
+    if (!title || !description || !url || !duration || !courseId) {
+        return res.status(400).json({
+            success: false,
+            message:
+                "Title, description, URL, duration and course ID are required",
+            data: null,
+        });
+    }
+
+    if (!validateUrl(url)) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid URL. Must be a valid HTTPS URL",
+            data: null,
+        });
+    }
+
+    if (isNaN(duration) || duration <= 0) {
+        return res.status(400).json({
+            success: false,
+            message: "Duration must be a positive number",
+            data: null,
+        });
+    }
+
+    const courseExists = await prisma.course.findUnique({
+        where: { id: courseId },
+    });
+
+    if (!courseExists) {
+        return res.status(404).json({
+            success: false,
+            message: "Course not found",
+            data: null,
+        });
+    }
+
+    const highestIndex = await prisma.video.findFirst({
+        where: { courseId },
+        orderBy: { index: "desc" },
+        select: { index: true },
+    });
+
+    const newIndex = (highestIndex?.index ?? -1) + 1;
+
+    const video = await prisma.video.create({
+        data: {
+            title,
+            description,
+            url,
+            duration: parseInt(duration),
+            courseId,
+            index: newIndex,
+        },
+        select: {
+            id: true,
+        },
+    });
+
+    return res.json({
+        success: true,
+        message: "Video added successfully",
+        data: {
+            id: video.id,
+        },
+    });
+};
+
+const getCourseHandler = async (req, res) => {
+    const { slug } = req.params;
+
+    if (!slug) {
+        return res.status(400).json({
+            success: false,
+            message: "Course slug is required",
+            data: null,
+        });
+    }
+
+    const course = await prisma.course.findUnique({
+        where: { slug, isLaunched: true },
+        include: {
+            videos: {
+                select: {
+                    title: true,
+                    description: true,
+                    index: true,
+                    duration: true,
+                },
+                orderBy: {
+                    index: "desc",
+                },
+            },
+        },
+    });
+
+    if (!course) {
+        return res.status(404).json({
+            success: false,
+            message: "Course not found",
+            data: null,
+        });
+    }
+
+    return res.json({
+        success: true,
+        message: "Course fetched successfully",
+        data: {
+            course,
+        },
+    });
+};
+
+export {
+    getAllCoursesHandler,
+    newCourseHandler,
+    newCourseVideoHandler,
+    getCourseHandler,
+};

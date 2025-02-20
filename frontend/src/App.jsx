@@ -14,9 +14,9 @@ import axios from "axios";
 import ForgotPassword from "@/pages/ForgotPassword.jsx";
 import VerifyOtp from "@/pages/VerifyOtp.jsx";
 import ResetPassword from "@/pages/ResetPassword.jsx";
-import Leaderboard from "@/pages/Leaderboard.jsx";
 import NoPageFound from "@/pages/404.jsx";
 import { useToast } from "@/hooks/use-toast";
+import CoursePage from "./pages/CoursePage";
 
 function App() {
     const initialState = {
@@ -74,6 +74,17 @@ function App() {
             children: [
                 {
                     path: "/",
+                    loader: async ({ request }) => {
+                        const courses = await axios
+                            .get(`${process.env.SERVER_URL}/course/all`, {
+                                validateStatus: false,
+                            })
+                            .then((res) => res.data);
+                        if (!courses) {
+                            return null;
+                        }
+                        return courses.data;
+                    },
                     element: <Home />,
                 },
                 {
@@ -132,84 +143,16 @@ function App() {
                     element: <ResetPassword />,
                 },
                 {
-                    path: "/leaderboard",
-                    loader: async () => {
-                        var res;
-                        try {
-                            res = await axios
-                                .get(`${process.env.SERVER_URL}/leaderboard`, {
-                                    headers: {
-                                        Authorization:
-                                            user.token != null ||
-                                            user.token != undefined
-                                                ? `Bearer ${user.token}`
-                                                : "",
-                                    },
-                                    validateStatus: false,
-                                })
-                                .then((res) => res.data);
-                        } catch (e) {
-                            return null;
-                        }
-                        if (!res.success) {
-                            return null;
-                        }
-                        return res.data.leaderboard;
+                    path: "/course/:slug",
+                    loader: async ({ params: { slug } }) => {
+                        const course = await axios
+                            .get(`${process.env.SERVER_URL}/course/${slug}`, {
+                                validateStatus: false,
+                            })
+                            .then((res) => res.data);
+                        return course.data;
                     },
-                    element: <Leaderboard />,
-                },
-                {
-                    path: "/gh-callback",
-                    loader: async ({ request }) => {
-                        var res;
-                        const requestToken = new URL(
-                            request.url,
-                        ).searchParams.get("requestToken");
-                        if (!requestToken) {
-                            return null;
-                        }
-                        try {
-                            res = await axios
-                                .get(
-                                    `${process.env.SERVER_URL}/auth/accessToken`,
-                                    {
-                                        headers: {
-                                            authorization: `Bearer ${requestToken}`,
-                                        },
-                                        validateStatus: false,
-                                    },
-                                )
-                                .then((res) => res.data);
-                        } catch (e) {
-                            return null;
-                        }
-                        if (!res.success) {
-                            return null;
-                        }
-                        setUser((prevUser) => {
-                            return {
-                                ...prevUser,
-                                token: res.data.accessToken,
-                                isAuthenticated: true,
-                            };
-                        });
-                        return redirect("/");
-                    },
-                    element: <Home />,
-                },
-                {
-                    path: "gh-callback-error",
-                    loader: async ({ request }) => {
-                        const error = new URL(request.url).searchParams.get(
-                            "error",
-                        );
-                        toast({
-                            title: "An Error Occurred",
-                            description: error,
-                        });
-                        return redirect("/login");
-                    },
-                    element: <Login />,
+                    element: <CoursePage />,
                 },
                 {
                     path: "*",

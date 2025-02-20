@@ -1,8 +1,12 @@
 import CourseCard from "@/components/custom/CourseCard";
 import { Button } from "@/components/ui/button";
 import React from "react";
+import { useLoaderData } from "react-router";
 
 function Home() {
+    const { courses } = useLoaderData();
+    console.log(courses);
+
     return (
         <div className="h-full-w-nav w-screen">
             <section className="bg-main text-text py-20">
@@ -26,84 +30,10 @@ function Home() {
                 </div>
             </section>
             <section>
-                <div className="grid-cols-5 grid p-10 gap-x-8 gap-y-6">
-                    <CourseCard
-                        course={{
-                            id: 1,
-                            title: "Test",
-                            image: "https://img-c.udemycdn.com/course/240x135/3600048_b195_20.jpg",
-                            instructor: "Test",
-                            rating: "5",
-                            price: 1000,
-                            students: 100,
-                        }}
-                    />
-                    <CourseCard
-                        course={{
-                            id: 1,
-                            title: "Test",
-                            image: "https://img-c.udemycdn.com/course/240x135/3600048_b195_20.jpg",
-                            instructor: "Test",
-                            rating: "5",
-                            price: 1000,
-                            students: 100,
-                        }}
-                    />
-                    <CourseCard
-                        course={{
-                            id: 1,
-                            title: "Test",
-                            image: "https://img-c.udemycdn.com/course/240x135/3600048_b195_20.jpg",
-                            instructor: "Test",
-                            rating: "5",
-                            price: 1000,
-                            students: 100,
-                        }}
-                    />
-                    <CourseCard
-                        course={{
-                            id: 1,
-                            title: "Test",
-                            image: "https://img-c.udemycdn.com/course/240x135/3600048_b195_20.jpg",
-                            instructor: "Test",
-                            rating: "5",
-                            price: 1000,
-                            students: 100,
-                        }}
-                    />
-                    <CourseCard
-                        course={{
-                            id: 1,
-                            title: "Test",
-                            image: "https://img-c.udemycdn.com/course/240x135/3600048_b195_20.jpg",
-                            instructor: "Test",
-                            rating: "5",
-                            price: 1000,
-                            students: 100,
-                        }}
-                    />
-                    <CourseCard
-                        course={{
-                            id: 1,
-                            title: "Test",
-                            image: "https://img-c.udemycdn.com/course/240x135/3600048_b195_20.jpg",
-                            instructor: "Test",
-                            rating: "5",
-                            price: 1000,
-                            students: 100,
-                        }}
-                    />
-                    <CourseCard
-                        course={{
-                            id: 1,
-                            title: "Test",
-                            image: "https://img-c.udemycdn.com/course/240x135/3600048_b195_20.jpg",
-                            instructor: "Test",
-                            rating: "5",
-                            price: 1000,
-                            students: 100,
-                        }}
-                    />
+                <div className="lg:grid-cols-3 md:grid-cols-2 grid-cols-1 grid p-10 gap-x-8 gap-y-6">
+                    {courses.map((course) => (
+                        <CourseCard key={course.id} course={course} className="max-w-md" />
+                    ))}
                 </div>
             </section>
         </div>

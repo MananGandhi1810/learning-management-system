@@ -14,4 +14,13 @@ const validateSlug = (slug) => {
     return /^[a-z0-9-]{3,}$/.test(String(slug).toLowerCase());
 };
 
-export { validateEmail, validatePassword, validateSlug };
+const validateUrl = (url) => {
+    try {
+        const urlObject = new URL(url);
+        return urlObject.protocol === "https:";
+    } catch {
+        return false;
+    }
+};
+
+export { validateEmail, validatePassword, validateSlug, validateUrl };

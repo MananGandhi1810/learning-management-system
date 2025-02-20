@@ -1,39 +1,42 @@
 import React from "react";
-import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
-import { Badge, Star } from "lucide-react";
+import {
+    Card,
+    CardHeader,
+    CardContent,
+    CardFooter,
+    CardTitle,
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { Link } from "react-router";
 
-function CourseCard({course}) {
+function CourseCard({ course, className }) {
     return (
-        <div>
-            <Card key={course.id} className="overflow-hidden">
-                <img
-                    src={course.image}
-                    alt={course.title}
-                    className="w-full h-48 object-cover"
-                />
+        <Link asChild to={`/course/${course.slug}`}>
+            <Card key={course.id} className={cn("overflow-hidden", className)}>
+                {course.thumbnailPath ? (
+                    <img
+                        src={course.thumbnailPath}
+                        alt={course.title}
+                        className="w-full h-48 object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+                        No thumbnail
+                    </div>
+                )}
                 <CardHeader>
                     <CardTitle className="text-lg">{course.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-gray-500 mb-2">
-                        {course.instructor}
+                    <p className="text-sm text-gray-500 line-clamp-2">
+                        {course.description}
                     </p>
-                    <div className="flex items-center mb-2">
-                        <span className="text-yellow-500 mr-1">
-                            {course.rating}
-                        </span>
-                        <Star className="w-4 h-4 fill-current text-yellow-500" />
-                        <span className="text-sm text-gray-500 ml-1">
-                            ({course.students.toLocaleString()} students)
-                        </span>
-                    </div>
                 </CardContent>
                 <CardFooter className="flex justify-between items-center">
-                    <span className="font-bold">${course.price}</span>
-                    <Badge variant="secondary">Bestseller</Badge>
+                    <span className="font-bold">₹{course.price}</span>
                 </CardFooter>
             </Card>
-        </div>
+        </Link>
     );
 }
 
