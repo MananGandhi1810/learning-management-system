@@ -17,6 +17,7 @@ import ResetPassword from "@/pages/ResetPassword.jsx";
 import NoPageFound from "@/pages/404.jsx";
 import { useToast } from "@/hooks/use-toast";
 import CoursePage from "./pages/CoursePage";
+import AllCoursesPage from "./pages/AllCoursesPage";
 
 function App() {
     const initialState = {
@@ -141,6 +142,22 @@ function App() {
                         return null;
                     },
                     element: <ResetPassword />,
+                },
+                {
+                    path: "/courses",
+                    loader: async ({ request }) => {
+                        const search = new URL(request.url).searchParams;
+                        const course = await axios
+                            .get(
+                                `${process.env.SERVER_URL}/course/all?${search}`,
+                                {
+                                    validateStatus: false,
+                                },
+                            )
+                            .then((res) => res.data);
+                        return course.data;
+                    },
+                    element: <AllCoursesPage />,
                 },
                 {
                     path: "/course/:slug",

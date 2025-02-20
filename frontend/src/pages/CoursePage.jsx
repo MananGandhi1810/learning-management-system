@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useLoaderData } from "react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Clock, PlayCircle } from "lucide-react";
@@ -35,7 +36,6 @@ function CoursePage() {
         (total, video) => total + video.duration,
         0,
     );
-    const [selectedVideo, setSelectedVideo] = useState(null);
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -103,48 +103,47 @@ function CoursePage() {
                             <h3 className="font-semibold">Course Content</h3>
                             <div className="space-y-2 mt-4">
                                 {sortedVideos.map((video) => (
-                                    <div
-                                        key={video.index}
-                                        className="flex items-center gap-3 text-sm p-2 hover:bg-muted rounded-lg transition-colors cursor-pointer"
-                                        onClick={() => setSelectedVideo(video)}
-                                    >
-                                        <span className="text-muted-foreground">
-                                            {video.index + 1}.
-                                        </span>
-                                        <span className="flex-1">
-                                            {video.title}
-                                        </span>
-                                        <span className="text-muted-foreground">
-                                            {formatDuration(video.duration)}
-                                        </span>
-                                    </div>
+                                    <Dialog key={video.index}>
+                                        <DialogTrigger className="w-full">
+                                            <div className="flex items-center gap-3 text-sm p-2 hover:bg-muted rounded-lg transition-colors cursor-pointer text-left">
+                                                <span className="text-muted-foreground">
+                                                    {video.index + 1}.
+                                                </span>
+                                                <span className="flex-1">
+                                                    {video.title}
+                                                </span>
+                                                <span className="text-muted-foreground">
+                                                    {formatDuration(
+                                                        video.duration,
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>
+                                                    {video.title}
+                                                </DialogTitle>
+                                            </DialogHeader>
+                                            <div className="mt-4">
+                                                <p className="text-muted-foreground">
+                                                    {video.description}
+                                                </p>
+                                                <div className="mt-4 text-sm text-muted-foreground">
+                                                    Duration:{" "}
+                                                    {formatDuration(
+                                                        video.duration,
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
                                 ))}
                             </div>
                         </div>
                     </CardContent>
                 </Card>
             </div>
-
-            <Dialog
-                open={!!selectedVideo}
-                onOpenChange={() => setSelectedVideo(null)}
-            >
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>{selectedVideo?.title}</DialogTitle>
-                    </DialogHeader>
-                    <div className="mt-4">
-                        <p className="text-muted-foreground">
-                            {selectedVideo?.description}
-                        </p>
-                        <div className="mt-4 text-sm text-muted-foreground">
-                            Duration:{" "}
-                            {selectedVideo &&
-                                formatDuration(selectedVideo.duration)}
-                        </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
         </div>
     );
 }
