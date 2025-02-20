@@ -4,9 +4,18 @@ import { validateSlug, validateUrl } from "../utils/validators.js";
 const prisma = new PrismaClient();
 
 const getAllCoursesHandler = async (req, res) => {
+    const { search, minPrice, maxPrice } = req.query;
     const courses = await prisma.course.findMany({
         where: {
             isLaunched: true,
+            ...(search && {
+                OR: [
+                    { title: { contains: search, mode: "insensitive" } },
+                    { description: { contains: search, mode: "insensitive" } },
+                ],
+            }),
+            ...(minPrice && { price: { gte: parseInt(minPrice) } }),
+            ...(maxPrice && { price: { lte: parseInt(maxPrice) } }),
         },
     });
     res.json({
