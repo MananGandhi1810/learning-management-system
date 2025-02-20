@@ -147,15 +147,13 @@ function App() {
                     path: "/courses",
                     loader: async ({ request }) => {
                         const search = new URL(request.url).searchParams;
-                        const course = await axios
-                            .get(
-                                `${process.env.SERVER_URL}/course/all?${search}`,
-                                {
-                                    validateStatus: false,
-                                },
-                            )
-                            .then((res) => res.data);
-                        return course.data;
+                        const response = await axios.get(
+                            `${process.env.SERVER_URL}/course/all?${search}`,
+                            {
+                                validateStatus: false,
+                            },
+                        );
+                        return response.data.data;
                     },
                     element: <AllCoursesPage />,
                 },
