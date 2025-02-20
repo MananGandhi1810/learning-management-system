@@ -2,7 +2,14 @@ import { Button } from "@/components/ui/button.jsx";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet.jsx";
 import AuthContext from "@/context/auth-provider.jsx";
 import { Terminal, ArrowRight, Zap, Computer } from "lucide-react";
-import { useContext, useEffect, useRef } from "react";
+import {
+    useContext,
+    useEffect,
+    useRef,
+    useCallback,
+    useMemo,
+    useState,
+} from "react";
 import { Link, useNavigate, useNavigation } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import {
@@ -19,12 +26,14 @@ import {
 import LoadingBar from "react-top-loading-bar";
 import { Input } from "../ui/input";
 import { Search } from "lucide-react";
+import debounce from "lodash/debounce";
 
 export default function NavBar() {
     const { user, setUser } = useContext(AuthContext);
     const { state: navState } = useNavigation();
     const loaderRef = useRef(null);
     const navigate = useNavigate();
+    const [searchValue, setSearchValue] = useState("");
 
     useEffect(() => {
         if (navState == "loading") {
@@ -44,6 +53,31 @@ export default function NavBar() {
             point: 0,
         });
     };
+
+    const debouncedNavigate = useMemo(
+        () =>
+            debounce((value) => {
+                if (value) {
+                    navigate(`/courses?search=${encodeURIComponent(value)}`);
+                }
+            }, 500),
+        [navigate],
+    );
+
+    const handleSearchChange = useCallback(
+        (e) => {
+            const value = e.target.value;
+            setSearchValue(value);
+            debouncedNavigate(value);
+        },
+        [debouncedNavigate],
+    );
+
+    useEffect(() => {
+        return () => {
+            debouncedNavigate.cancel();
+        };
+    }, [debouncedNavigate]);
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background dark:bg-background">
@@ -76,6 +110,9 @@ export default function NavBar() {
                     <div className="relative invisible md:visible">
                         <Input
                             type="search"
+                            name="search"
+                            value={searchValue}
+                            onChange={handleSearchChange}
                             placeholder="Search for courses"
                             className="pl-10 pr-4 py-2 rounded-full border-gray-300 focus:[#34dded]"
                         />
@@ -159,6 +196,9 @@ export default function NavBar() {
                                 <div className="relative">
                                     <Input
                                         type="search"
+                                        name="search"
+                                        value={searchValue}
+                                        onChange={handleSearchChange}
                                         placeholder="Search for courses"
                                         className="pl-10 pr-4 py-2 rounded-full border-gray-300 focus:[#34dded]"
                                     />
