@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import authRouter from "./router/auth.js";
 import courseRouter from "./router/course.js";
+import cartRouter from "./router/cart.js";
 import logger from "morgan";
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(
 
 app.use("/auth", authRouter);
 app.use("/course", courseRouter);
+app.use("/cart", cartRouter);
 
 app.use(function (req, res, next) {
     res.status(404).json({
@@ -29,7 +31,7 @@ app.use(function (req, res, next) {
 app.use(function (err, req, res, next) {
     res.locals.message = err.message;
     res.locals.error = req.app.get("env") === "development" ? err : {};
-    console.log(err)
+    console.log(err);
 
     res.status(err.status || 500).json({
         success: false,

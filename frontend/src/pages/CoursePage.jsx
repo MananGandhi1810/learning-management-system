@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useLoaderData } from "react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Clock, PlayCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
+import AuthContext from "@/context/auth-provider";
 
 function formatDuration(seconds) {
     const hours = Math.floor(seconds / 3600);
@@ -32,10 +35,36 @@ function formatDuration(seconds) {
 function CoursePage() {
     const { course } = useLoaderData();
     const sortedVideos = [...course.videos].sort((a, b) => a.index - b.index);
+    const { user } = useContext(AuthContext);
     const totalDuration = course.videos.reduce(
         (total, video) => total + video.duration,
         0,
     );
+    const { toast } = useToast();
+
+    const addToCart = async (id) => {
+        console.log(user);
+        const res = await axios
+            .put(
+                `${process.env.SERVER_URL}/cart/${id}`,
+                {},
+                {
+                    headers: { Authorization: `Bearer ${user.token}` },
+                    validateStatus: false,
+                },
+            )
+            .then((res) => res.data);
+        if (!res.success) {
+            toast({
+                title: "Could not add to cart",
+                description: res.message,
+            });
+        } else {
+            toast({
+                title: "Course added to cart",
+            });
+        }
+    };
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -94,8 +123,12 @@ function CoursePage() {
                             <span className="text-3xl font-bold">
                                 ${course.price}
                             </span>
-                            <Button size="lg" className="w-32">
-                                Buy Now
+                            <Button
+                                size="lg"
+                                className="w-32"
+                                onClick={() => addToCart(course.id)}
+                            >
+                                Add to Cart
                             </Button>
                         </div>
                         <Separator className="my-4" />

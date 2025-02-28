@@ -19,12 +19,13 @@ model User {
     updatedAt         DateTime     @updatedAt
     passwordUpdatedAt DateTime     @default(now())
     courses           CourseUser[]
+    cartItems         CartItem[]
 }
 
 model Course {
     id            String       @id @default(cuid())
     slug          String       @unique
-    thumbnailPath String?
+    thumbnailPath String
     title         String
     description   String
     price         Int
@@ -33,6 +34,8 @@ model Course {
     users         CourseUser[]
     createdAt     DateTime     @default(now())
     updatedAt     DateTime     @updatedAt
+    cartItem      CartItem[]   @relation(name: "CartItem")
+    cartItemId    String?
 
     @@index([slug])
 }
@@ -60,4 +63,14 @@ model CourseUser {
     @@unique([userId, courseId])
     @@index([userId])
     @@index([courseId])
+}
+
+model CartItem {
+    id        String   @id @default(cuid())
+    userId    String   @unique
+    user      User     @relation(fields: [userId], references: [id])
+    course    Course   @relation("CartItem", fields: [courseId], references: [id])
+    courseId  String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

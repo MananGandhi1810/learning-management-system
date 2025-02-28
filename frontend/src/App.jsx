@@ -18,6 +18,7 @@ import NoPageFound from "@/pages/404.jsx";
 import { useToast } from "@/hooks/use-toast";
 import CoursePage from "./pages/CoursePage";
 import AllCoursesPage from "./pages/AllCoursesPage";
+import CartPage from "./pages/CartPage";
 
 function App() {
     const initialState = {
@@ -168,6 +169,16 @@ function App() {
                         return course.data;
                     },
                     element: <CoursePage />,
+                },
+                {
+                    path: "/cart",
+                    loader: async (req) => {
+                        if (!user.isAuthenticated) {
+                            return redirect("/login?next=/cart");
+                        }
+                        return null
+                    },
+                    element: <CartPage />,
                 },
                 {
                     path: "*",

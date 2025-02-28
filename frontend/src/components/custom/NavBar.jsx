@@ -27,6 +27,7 @@ import LoadingBar from "react-top-loading-bar";
 import { Input } from "../ui/input";
 import { Search } from "lucide-react";
 import debounce from "lodash/debounce";
+import { ShoppingCart } from "lucide-react";
 
 export default function NavBar() {
     const { user, setUser } = useContext(AuthContext);
@@ -103,6 +104,12 @@ export default function NavBar() {
                             className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 relative after:bg-white after:absolute after:h-0.5 after:w-0 after:-bottom-1 after:left-0 hover:after:w-full after:transition-all duration-300"
                         >
                             Courses
+                        </Link>
+                        <Link
+                            to="/cart"
+                            className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 relative after:bg-white after:absolute after:h-0.5 after:w-0 after:-bottom-1 after:left-0 hover:after:w-full after:transition-all duration-300"
+                        >
+                            Cart
                         </Link>
                     </nav>
                 </div>
@@ -192,6 +199,12 @@ export default function NavBar() {
                                     className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
                                 >
                                     Courses
+                                </Link>
+                                <Link
+                                    to="/cart"
+                                    className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                                >
+                                    Cart
                                 </Link>
                                 <div className="relative">
                                     <Input

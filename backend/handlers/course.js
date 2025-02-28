@@ -28,11 +28,19 @@ const getAllCoursesHandler = async (req, res) => {
 };
 
 const newCourseHandler = async (req, res) => {
-    const { title, description, price, slug } = req.body;
-    if (!title || !description || !price || isNaN(price) || !slug) {
+    const { title, description, price, slug, thumbnailUrl } = req.body;
+    if (
+        !title ||
+        !description ||
+        !price ||
+        isNaN(price) ||
+        !slug ||
+        !thumbnailUrl
+    ) {
         return res.status(400).json({
             success: false,
-            message: "Title, description, slug and price are required",
+            message:
+                "Title, description, slug, thumbnail URL and price are required",
             data: null,
         });
     }
@@ -51,6 +59,13 @@ const newCourseHandler = async (req, res) => {
             data: null,
         });
     }
+    if (!validateUrl(thumbnailUrl)) {
+        return res.status(400).json({
+            success: false,
+            message: "Please provide a valid URL",
+            data: null,
+        });
+    }
     const existingSlug = await prisma.course.count({ where: { slug } });
     if (existingSlug > 0) {
         return res.status(400).json({
@@ -64,6 +79,7 @@ const newCourseHandler = async (req, res) => {
             title,
             description,
             slug,
+            thumbnailPath: thumbnailUrl,
             price: parseInt(price),
         },
         select: {
