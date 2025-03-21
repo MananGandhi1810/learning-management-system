@@ -19,6 +19,9 @@ import { useToast } from "@/hooks/use-toast";
 import CoursePage from "./pages/CoursePage";
 import AllCoursesPage from "./pages/AllCoursesPage";
 import CartPage from "./pages/CartPage";
+import MyCoursesPage from "./pages/MyCoursesPage";
+import CourseContentPage from "./pages/CourseContentPage";
+import VideoPlayerPage from "./pages/VideoPlayerPage";
 
 function App() {
     const initialState = {
@@ -57,7 +60,6 @@ function App() {
             id: res.data.id,
             name: res.data.name,
             email: res.data.email,
-            points: res.data.points,
         });
     };
 
@@ -176,9 +178,47 @@ function App() {
                         if (!user.isAuthenticated) {
                             return redirect("/login?next=/cart");
                         }
-                        return null
+                        return null;
                     },
                     element: <CartPage />,
+                },
+                {
+                    path: "/my-courses",
+                    loader: ({ request }) => {
+                        if (!user.isAuthenticated) {
+                            return redirect("/login?next=/my-courses");
+                        }
+                        return null;
+                    },
+                    element: <MyCoursesPage />,
+                },
+                {
+                    path: "/my-courses/:slug",
+                    loader: ({ request }) => {
+                        if (!user.isAuthenticated) {
+                            return redirect(
+                                `/login?next=${encodeURIComponent(
+                                    request.url,
+                                )}`,
+                            );
+                        }
+                        return null;
+                    },
+                    element: <CourseContentPage />,
+                },
+                {
+                    path: "/my-courses/:slug/video/:videoId",
+                    loader: ({ request }) => {
+                        if (!user.isAuthenticated) {
+                            return redirect(
+                                `/login?next=${encodeURIComponent(
+                                    request.url,
+                                )}`,
+                            );
+                        }
+                        return null;
+                    },
+                    element: <VideoPlayerPage />,
                 },
                 {
                     path: "*",

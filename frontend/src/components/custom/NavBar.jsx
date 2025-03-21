@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button.jsx";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet.jsx";
 import AuthContext from "@/context/auth-provider.jsx";
-import { Terminal, ArrowRight, Zap, Computer } from "lucide-react";
+import { Terminal, ArrowRight, Zap, Computer, Sparkles } from "lucide-react";
 import {
     useContext,
     useEffect,
@@ -28,6 +28,7 @@ import { Input } from "../ui/input";
 import { Search } from "lucide-react";
 import debounce from "lodash/debounce";
 import { ShoppingCart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export default function NavBar() {
     const { user, setUser } = useContext(AuthContext);
@@ -81,34 +82,47 @@ export default function NavBar() {
     }, [debouncedNavigate]);
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b bg-background dark:bg-background">
-            <LoadingBar color="#ffffff" ref={loaderRef} />
+        <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md dark:bg-background/80">
+            <LoadingBar color="#667efd" height={3} ref={loaderRef} />
             <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
                 <div className="flex-1 flex flex-row">
                     <Link
                         to="/"
                         className="flex items-center gap-2 justify-start w-min pr-10"
                     >
-                        <Computer />{" "}
-                        <span className="font-medium">SkillMaster</span>
+                        <span className="gradient-bg p-1.5 rounded-md text-white">
+                            <Sparkles size={20} />
+                        </span>
+                        <span className="font-semibold text-lg font-poppins">
+                            Skill<span className="gradient-text">Master</span>
+                        </span>
                     </Link>
                     <nav className="hidden items-center gap-6 text-sm font-medium md:flex flex-1">
                         <Link
                             to="/"
-                            className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 relative after:bg-white after:absolute after:h-0.5 after:w-0 after:-bottom-1 after:left-0 hover:after:w-full after:transition-all duration-300"
+                            className="nav-link text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-50"
                         >
                             Home
                         </Link>
                         <Link
                             to="/courses"
-                            className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 relative after:bg-white after:absolute after:h-0.5 after:w-0 after:-bottom-1 after:left-0 hover:after:w-full after:transition-all duration-300"
+                            className="nav-link text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-50"
                         >
                             Courses
                         </Link>
+                        {user.isAuthenticated && (
+                            <Link
+                                to="/my-courses"
+                                className="nav-link text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-50"
+                            >
+                                My Courses
+                            </Link>
+                        )}
                         <Link
                             to="/cart"
-                            className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 relative after:bg-white after:absolute after:h-0.5 after:w-0 after:-bottom-1 after:left-0 hover:after:w-full after:transition-all duration-300"
+                            className="nav-link text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-50 flex items-center gap-1"
                         >
+                            <ShoppingCart size={16} />
                             Cart
                         </Link>
                     </nav>
@@ -121,22 +135,32 @@ export default function NavBar() {
                             value={searchValue}
                             onChange={handleSearchChange}
                             placeholder="Search for courses"
-                            className="pl-10 pr-4 py-2 rounded-full border-gray-300 focus:[#34dded]"
+                            className="pl-10 pr-4 py-2 rounded-full border-gray-300 focus-visible:ring-primary/70"
                         />
                         <Search
                             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                            size={20}
+                            size={18}
                         />
                     </div>
                     {!user.isAuthenticated ? (
                         <div className="flex gap-4">
-                            <Button variant="outline" asChild>
+                            <Button
+                                variant="outline"
+                                asChild
+                                className="rounded-full"
+                            >
                                 <Link to="/login">Login</Link>
                             </Button>
-                            <Button className="group" asChild>
-                                <Link to="/register">
+                            <Button
+                                className="group rounded-full gradient-bg hover:opacity-90 transition-opacity"
+                                asChild
+                            >
+                                <Link
+                                    to="/register"
+                                    className="flex items-center"
+                                >
                                     Register
-                                    <ArrowRight className="ml-2 z-10 group-hover:ml-3 duration-200" />
+                                    <ArrowRight className="ml-2 z-10 group-hover:translate-x-1 transition-transform" />
                                 </Link>
                             </Button>
                         </div>
@@ -147,9 +171,9 @@ export default function NavBar() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="rounded-full"
+                                        className="rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
                                     >
-                                        <LogOut />
+                                        <LogOut size={18} />
                                     </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -165,7 +189,10 @@ export default function NavBar() {
                                         <AlertDialogCancel>
                                             Cancel
                                         </AlertDialogCancel>
-                                        <AlertDialogAction onClick={logout}>
+                                        <AlertDialogAction
+                                            onClick={logout}
+                                            className="gradient-bg hover:opacity-90"
+                                        >
                                             Yes, log out
                                         </AlertDialogAction>
                                     </AlertDialogFooter>
@@ -187,37 +214,54 @@ export default function NavBar() {
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="left" className="md:hidden">
+                            <div className="flex items-center gap-2 mb-6 mt-2">
+                                <span className="gradient-bg p-1.5 rounded-md text-white">
+                                    <Sparkles size={18} />
+                                </span>
+                                <span className="font-semibold text-lg">
+                                    SkillMaster
+                                </span>
+                            </div>
                             <div className="grid gap-4 p-4">
                                 <Link
                                     to="/"
-                                    className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                                    className="text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-50 flex items-center gap-2 p-2 hover:bg-secondary rounded-md"
                                 >
                                     Home
                                 </Link>
                                 <Link
                                     to="/courses"
-                                    className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                                    className="text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-50 flex items-center gap-2 p-2 hover:bg-secondary rounded-md"
                                 >
                                     Courses
                                 </Link>
+                                {user.isAuthenticated && (
+                                    <Link
+                                        to="/my-courses"
+                                        className="text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-50 flex items-center gap-2 p-2 hover:bg-secondary rounded-md"
+                                    >
+                                        My Courses
+                                    </Link>
+                                )}
                                 <Link
                                     to="/cart"
-                                    className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                                    className="text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-50 flex items-center gap-2 p-2 hover:bg-secondary rounded-md"
                                 >
+                                    <ShoppingCart size={16} />
                                     Cart
                                 </Link>
-                                <div className="relative">
+                                <div className="relative mt-4">
                                     <Input
                                         type="search"
                                         name="search"
                                         value={searchValue}
                                         onChange={handleSearchChange}
                                         placeholder="Search for courses"
-                                        className="pl-10 pr-4 py-2 rounded-full border-gray-300 focus:[#34dded]"
+                                        className="pl-10 pr-4 py-2 rounded-full border-gray-300 w-full"
                                     />
                                     <Search
                                         className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                                        size={20}
+                                        size={18}
                                     />
                                 </div>
                             </div>

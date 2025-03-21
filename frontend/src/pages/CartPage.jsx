@@ -1,11 +1,15 @@
 import AuthContext from "@/context/auth-provider";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { Link, redirect, useLoaderData } from "react-router-dom";
+import { Link, redirect, useLoaderData, useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const CartPage = () => {
     const [cart, setCart] = useState([]);
+    const [isProcessing, setIsProcessing] = useState(false);
     const { user } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const { toast } = useToast();
 
     const loadCart = async () => {
         const cart = await axios
@@ -26,6 +30,41 @@ const CartPage = () => {
         });
         loadCart();
     };
+
+    const checkout = async () => {
+        if (cart.length === 0) return;
+
+        setIsProcessing(true);
+        try {
+            // Purchase each course in cart
+            for (const item of cart) {
+                await axios.post(
+                    `${process.env.SERVER_URL}/cart/purchase`,
+                    { courseId: item.id },
+                    {
+                        headers: { Authorization: `Bearer ${user.token}` },
+                        validateStatus: false,
+                    },
+                );
+            }
+
+            toast({
+                title: "Purchase successful",
+                description: "All courses have been added to your library",
+            });
+
+            navigate("/my-courses");
+        } catch (error) {
+            toast({
+                title: "Checkout failed",
+                description: "There was an error processing your purchase",
+                variant: "destructive",
+            });
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     useEffect(() => loadCart, []);
 
     return (
@@ -94,8 +133,12 @@ const CartPage = () => {
                                     0,
                                 )}
                             </h3>
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full">
-                                Checkout
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full disabled:opacity-50"
+                                onClick={checkout}
+                                disabled={isProcessing || cart.length === 0}
+                            >
+                                {isProcessing ? "Processing..." : "Checkout"}
                             </button>
                         </div>
                     </div>

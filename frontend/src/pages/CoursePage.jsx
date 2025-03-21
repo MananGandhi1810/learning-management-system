@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { useLoaderData } from "react-router";
+import React, { useContext, useState, useEffect } from "react";
+import { useLoaderData, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -13,6 +13,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogFooter,
+    DialogDescription,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Clock, PlayCircle } from "lucide-react";
@@ -41,6 +43,41 @@ function CoursePage() {
         0,
     );
     const { toast } = useToast();
+    const navigate = useNavigate();
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [hasAccess, setHasAccess] = useState(false);
+    const [checkingAccess, setCheckingAccess] = useState(true);
+
+    useEffect(() => {
+        const checkCourseAccess = async () => {
+            if (!user.isAuthenticated) {
+                setCheckingAccess(false);
+                return;
+            }
+
+            try {
+                const res = await axios.get(
+                    `${process.env.SERVER_URL}/course/${course.slug}/videos`,
+                    {
+                        headers: { Authorization: `Bearer ${user.token}` },
+                        validateStatus: false,
+                    },
+                );
+
+                if (res.data.success) {
+                    setHasAccess(true);
+                }
+            } catch (error) {
+                // If error, user doesn't have access - default state is false
+                console.log("User doesn't have access to this course");
+            } finally {
+                setCheckingAccess(false);
+            }
+        };
+
+        checkCourseAccess();
+    }, [course.slug, user.isAuthenticated, user.token]);
 
     const addToCart = async (id) => {
         console.log(user);
@@ -63,6 +100,43 @@ function CoursePage() {
             toast({
                 title: "Course added to cart",
             });
+        }
+    };
+
+    const purchaseCourse = async () => {
+        setIsProcessing(true);
+        try {
+            const res = await axios.post(
+                `${process.env.SERVER_URL}/cart/purchase`,
+                { courseId: course.id },
+                {
+                    headers: { Authorization: `Bearer ${user.token}` },
+                    validateStatus: false,
+                },
+            );
+
+            if (res.data.success) {
+                toast({
+                    title: "Purchase successful",
+                    description: "You now have access to this course",
+                });
+                navigate(`/my-courses/${course.slug}`);
+            } else {
+                toast({
+                    title: "Purchase failed",
+                    description: res.data.message,
+                    variant: "destructive",
+                });
+            }
+        } catch (error) {
+            toast({
+                title: "Purchase failed",
+                description: "Something went wrong",
+                variant: "destructive",
+            });
+        } finally {
+            setIsProcessing(false);
+            setConfirmOpen(false);
         }
     };
 
@@ -123,13 +197,36 @@ function CoursePage() {
                             <span className="text-3xl font-bold">
                                 ₹{course.price}
                             </span>
-                            <Button
-                                size="lg"
-                                className="w-32"
-                                onClick={() => addToCart(course.id)}
-                            >
-                                Add to Cart
-                            </Button>
+                            <div className="space-x-2">
+                                {checkingAccess ? (
+                                    <Button disabled>Checking access...</Button>
+                                ) : hasAccess ? (
+                                    <Button
+                                        onClick={() =>
+                                            navigate(
+                                                `/my-courses/${course.slug}`,
+                                            )
+                                        }
+                                        className="w-full"
+                                    >
+                                        Go to Course
+                                    </Button>
+                                ) : (
+                                    <>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => addToCart(course.id)}
+                                        >
+                                            Add to Cart
+                                        </Button>
+                                        <Button
+                                            onClick={() => setConfirmOpen(true)}
+                                        >
+                                            Buy Now
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
                         </div>
                         <Separator className="my-4" />
                         <div className="space-y-1">
@@ -177,6 +274,38 @@ function CoursePage() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Purchase Confirmation Dialog - only render if not hasAccess */}
+            {!hasAccess && (
+                <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Confirm Purchase</DialogTitle>
+                            <DialogDescription>
+                                You are about to purchase {course.title} for ₹
+                                {course.price}. Would you like to proceed?
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button
+                                variant="outline"
+                                onClick={() => setConfirmOpen(false)}
+                                disabled={isProcessing}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={purchaseCourse}
+                                disabled={isProcessing}
+                            >
+                                {isProcessing
+                                    ? "Processing..."
+                                    : "Confirm Purchase"}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            )}
         </div>
     );
 }

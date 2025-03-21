@@ -92,4 +92,73 @@ const removeFromCartHandler = async (req, res) => {
     });
 };
 
-export { getCartHandler, addToCartHandler, removeFromCartHandler };
+const purchaseCourseHandler = async (req, res) => {
+    const { courseId } = req.body;
+
+    if (!courseId) {
+        return res.status(400).json({
+            success: false,
+            message: "Course ID is required",
+            data: null,
+        });
+    }
+
+    const course = await prisma.course.findUnique({
+        where: { id: courseId, isLaunched: true },
+    });
+
+    if (!course) {
+        return res.status(404).json({
+            success: false,
+            message: "Course not found or not available",
+            data: null,
+        });
+    }
+
+    // Check if user already has this course
+    const existingEnrollment = await prisma.courseUser.findUnique({
+        where: {
+            userId_courseId: {
+                userId: req.user.id,
+                courseId: courseId,
+            },
+        },
+    });
+
+    if (existingEnrollment) {
+        return res.status(400).json({
+            success: false,
+            message: "You already have access to this course",
+            data: null,
+        });
+    }
+
+    // Create enrollment record
+    await prisma.courseUser.create({
+        data: {
+            userId: req.user.id,
+            courseId: courseId,
+        },
+    });
+
+    // If the course was in the cart, remove it
+    await prisma.cartItem.deleteMany({
+        where: {
+            userId: req.user.id,
+            courseId: courseId,
+        },
+    });
+
+    return res.json({
+        success: true,
+        message: "Course purchased successfully",
+        data: null,
+    });
+};
+
+export {
+    getCartHandler,
+    addToCartHandler,
+    removeFromCartHandler,
+    purchaseCourseHandler,
+};

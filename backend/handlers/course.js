@@ -211,9 +211,170 @@ const getCourseHandler = async (req, res) => {
     });
 };
 
+const getUserCoursesHandler = async (req, res) => {
+    const userCourses = await prisma.courseUser.findMany({
+        where: {
+            userId: req.user.id,
+        },
+        include: {
+            course: {
+                select: {
+                    id: true,
+                    slug: true,
+                    title: true,
+                    description: true,
+                    thumbnailPath: true,
+                    price: true,
+                    updatedAt: true,
+                },
+            },
+        },
+    });
+
+    return res.json({
+        success: true,
+        message: "User courses fetched successfully",
+        data: {
+            courses: userCourses.map((uc) => uc.course),
+        },
+    });
+};
+
+const getUserCourseVideosHandler = async (req, res) => {
+    const { slug } = req.params;
+
+    if (!slug) {
+        return res.status(400).json({
+            success: false,
+            message: "Course slug is required",
+            data: null,
+        });
+    }
+
+    // Get course and check if user has access
+    const course = await prisma.course.findUnique({
+        where: { slug },
+        include: {
+            users: {
+                where: {
+                    userId: req.user.id,
+                },
+            },
+            videos: {
+                orderBy: {
+                    index: "asc",
+                },
+            },
+        },
+    });
+
+    if (!course) {
+        return res.status(404).json({
+            success: false,
+            message: "Course not found",
+            data: null,
+        });
+    }
+
+    if (course.users.length === 0) {
+        return res.status(403).json({
+            success: false,
+            message: "You don't have access to this course",
+            data: null,
+        });
+    }
+
+    return res.json({
+        success: true,
+        message: "Course videos fetched successfully",
+        data: {
+            course: {
+                id: course.id,
+                slug: course.slug,
+                title: course.title,
+                description: course.description,
+                thumbnailPath: course.thumbnailPath,
+                videos: course.videos,
+            },
+        },
+    });
+};
+
+const getCourseVideoHandler = async (req, res) => {
+    const { slug, videoId } = req.params;
+
+    if (!slug || !videoId) {
+        return res.status(400).json({
+            success: false,
+            message: "Course slug and video ID are required",
+            data: null,
+        });
+    }
+
+    // Get course and check if user has access
+    const course = await prisma.course.findUnique({
+        where: { slug },
+        include: {
+            users: {
+                where: {
+                    userId: req.user.id,
+                },
+            },
+        },
+    });
+
+    if (!course) {
+        return res.status(404).json({
+            success: false,
+            message: "Course not found",
+            data: null,
+        });
+    }
+
+    if (course.users.length === 0) {
+        return res.status(403).json({
+            success: false,
+            message: "You don't have access to this course",
+            data: null,
+        });
+    }
+
+    // Get the video
+    const video = await prisma.video.findFirst({
+        where: {
+            id: videoId,
+            courseId: course.id,
+        },
+    });
+
+    if (!video) {
+        return res.status(404).json({
+            success: false,
+            message: "Video not found",
+            data: null,
+        });
+    }
+
+    return res.json({
+        success: true,
+        message: "Video fetched successfully",
+        data: {
+            video,
+            course: {
+                id: course.id,
+                slug: course.slug,
+                title: course.title,
+            },
+        },
+    });
+};
+
 export {
     getAllCoursesHandler,
     newCourseHandler,
     newCourseVideoHandler,
     getCourseHandler,
+    getUserCoursesHandler,
+    getUserCourseVideosHandler,
+    getCourseVideoHandler,
 };
