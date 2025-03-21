@@ -67,7 +67,7 @@ model CourseUser {
 
 model CartItem {
     id        String   @id @default(cuid())
-    userId    String   @unique
+    userId    String
     user      User     @relation(fields: [userId], references: [id])
     course    Course   @relation("CartItem", fields: [courseId], references: [id])
     courseId  String

@@ -79,12 +79,14 @@ const removeFromCartHandler = async (req, res) => {
             data: null,
         });
     }
-    await prisma.cartItem.delete({
+    const cartItem = await prisma.cartItem.findFirst({
         where: {
             courseId: id,
             userId: req.user.id,
         },
+        select: { id: true },
     });
+    await prisma.cartItem.delete({ where: { id: cartItem.id } });
     res.json({
         status: true,
         message: "Item deleted from cart",
