@@ -50,31 +50,6 @@ function Home() {
                 </div>
             </section>
 
-            <section className="py-16 bg-gray-50 dark:bg-gray-900/30">
-                <div className="container mx-auto px-4">
-                    <div className="flex flex-col md:flex-row justify-between items-center mb-12">
-                        <h2 className="text-3xl font-bold mb-4 md:mb-0">
-                            Featured Courses
-                        </h2>
-                        <Link
-                            to="/courses"
-                            className="text-primary hover:underline flex items-center gap-2 font-medium"
-                        >
-                            View all courses <Zap size={16} />
-                        </Link>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
-                        {courses.slice(0, 6).map((course) => (
-                            <CourseCard
-                                key={course.id}
-                                course={course}
-                                className="hover-scale card-glow"
-                            />
-                        ))}
-                    </div>
-                </div>
-            </section>
-
             <section className="py-16 bg-white dark:bg-gray-800/20">
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold mb-12 text-center">
@@ -117,6 +92,31 @@ function Home() {
                                 your career or change paths entirely.
                             </p>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className="py-16 bg-gray-50 dark:bg-gray-900/30">
+                <div className="container mx-auto px-4">
+                    <div className="flex flex-col md:flex-row justify-between items-center mb-12">
+                        <h2 className="text-3xl font-bold mb-4 md:mb-0">
+                            Featured Courses
+                        </h2>
+                        <Link
+                            to="/courses"
+                            className="text-primary hover:underline flex items-center gap-2 font-medium"
+                        >
+                            View all courses <Zap size={16} />
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
+                        {courses.slice(0, 3).map((course) => (
+                            <CourseCard
+                                key={course.id}
+                                course={course}
+                                className="card-glow"
+                            />
+                        ))}
                     </div>
                 </div>
             </section>

@@ -99,9 +99,6 @@ function CourseContentPage() {
                             className="w-full h-[300px] object-cover"
                         />
                         <div className="p-6">
-                            <h2 className="text-2xl font-semibold">
-                                Course Content
-                            </h2>
                             <p className="text-muted-foreground mt-2">
                                 {courseData.videos.length} videos • Total{" "}
                                 {formatDuration(

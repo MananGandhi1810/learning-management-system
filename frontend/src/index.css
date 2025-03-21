@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -68,7 +68,7 @@
 
     body {
         @apply bg-background text-foreground;
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
     }
 
     h1,
@@ -77,18 +77,26 @@
     h4,
     h5,
     h6 {
-        font-family: 'Poppins', sans-serif;
+        font-family: "Poppins", sans-serif;
         @apply font-semibold;
     }
 }
 
 /* Custom gradients */
 .gradient-bg {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    background: linear-gradient(
+        135deg,
+        hsl(var(--primary)) 0%,
+        hsl(var(--accent)) 100%
+    );
 }
 
 .gradient-text {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    background: linear-gradient(
+        135deg,
+        hsl(var(--primary)) 0%,
+        hsl(var(--accent)) 100%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -135,7 +143,7 @@
 }
 
 .nav-link::after {
-    content: '';
+    content: "";
     position: absolute;
     width: 0;
     height: 2px;
