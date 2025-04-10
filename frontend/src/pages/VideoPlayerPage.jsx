@@ -75,12 +75,11 @@ function VideoPlayerPage() {
                 </p>
             </div>
 
-            <div className="aspect-video mb-8 bg-black rounded-lg overflow-hidden">
+            <div className="aspect-video mb-8 bg-transparent rounded-lg overflow-hidden">
                 <iframe
                     src={videoData.video.url}
                     className="w-full h-full"
                     title={videoData.video.title}
-                    frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                 ></iframe>

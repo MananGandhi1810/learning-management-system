@@ -1,12 +1,14 @@
 import CourseCard from "@/components/custom/CourseCard";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useContext } from "react";
 import { useLoaderData } from "react-router";
 import { Link } from "react-router-dom";
 import { BookOpen, CheckCircle, Zap, Sparkles } from "lucide-react";
+import AuthContext from "@/context/auth-provider";
 
 function Home() {
     const { courses } = useLoaderData();
+    const { user } = useContext(AuthContext);
 
     return (
         <div className="h-full w-screen overflow-hidden">
@@ -37,14 +39,16 @@ function Home() {
                             >
                                 <Link to="/courses">Explore Courses</Link>
                             </Button>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                asChild
-                                className="bg-transparent border-white text-white hover:bg-white/10 rounded-full px-8 font-medium"
-                            >
-                                <Link to="/register">Join Now</Link>
-                            </Button>
+                            {!user.isAuthenticated && (
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    asChild
+                                    className="bg-transparent border-white text-white hover:bg-white/10 rounded-full px-8 font-medium"
+                                >
+                                    <Link to="/register">Join Now</Link>
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -114,7 +118,7 @@ function Home() {
                             <CourseCard
                                 key={course.id}
                                 course={course}
-                                className="card-glow"
+                                className="card-glow h-full"
                             />
                         ))}
                     </div>

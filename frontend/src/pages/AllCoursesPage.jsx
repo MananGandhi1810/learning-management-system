@@ -186,7 +186,11 @@ function AllCoursesPage() {
             ) : (
                 <div className="lg:grid-cols-4 md:grid-cols-2 grid-cols-1 grid gap-x-6 gap-y-8">
                     {courses.map((course) => (
-                        <CourseCard key={course.id} course={course} />
+                        <CourseCard
+                            key={course.id}
+                            course={course}
+                            className="h-full"
+                        />
                     ))}
                 </div>
             )}

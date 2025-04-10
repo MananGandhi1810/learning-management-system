@@ -14,8 +14,10 @@ const getAllCoursesHandler = async (req, res) => {
                     { description: { contains: search, mode: "insensitive" } },
                 ],
             }),
-            ...(minPrice && { price: { gte: parseInt(minPrice) } }),
-            ...(maxPrice && { price: { lte: parseInt(maxPrice) } }),
+            price: {
+                ...(minPrice && { gte: parseInt(minPrice) }),
+                ...(maxPrice && { lte: parseInt(maxPrice) }),
+            },
         },
     });
     res.json({
@@ -251,7 +253,6 @@ const getUserCourseVideosHandler = async (req, res) => {
         });
     }
 
-    // Get course and check if user has access
     const course = await prisma.course.findUnique({
         where: { slug },
         include: {
@@ -311,7 +312,6 @@ const getCourseVideoHandler = async (req, res) => {
         });
     }
 
-    // Get course and check if user has access
     const course = await prisma.course.findUnique({
         where: { slug },
         include: {
@@ -339,7 +339,6 @@ const getCourseVideoHandler = async (req, res) => {
         });
     }
 
-    // Get the video
     const video = await prisma.video.findFirst({
         where: {
             id: videoId,

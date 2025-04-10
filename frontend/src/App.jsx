@@ -168,7 +168,19 @@ function App() {
                                 validateStatus: false,
                             })
                             .then((res) => res.data);
-                        return course.data;
+
+                        const reviews = await axios
+                            .get(`${process.env.SERVER_URL}/reviews/${slug}`, {
+                                validateStatus: false,
+                            })
+                            .then((res) => res.data?.data || [])
+                            .catch(() => []);
+
+                        console.log(course);
+                        return {
+                            course: course.data.course,
+                            reviews,
+                        };
                     },
                     element: <CoursePage />,
                 },

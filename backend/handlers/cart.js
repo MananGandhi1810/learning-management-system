@@ -117,7 +117,6 @@ const purchaseCourseHandler = async (req, res) => {
         });
     }
 
-    // Check if user already has this course
     const existingEnrollment = await prisma.courseUser.findUnique({
         where: {
             userId_courseId: {
@@ -135,7 +134,6 @@ const purchaseCourseHandler = async (req, res) => {
         });
     }
 
-    // Create enrollment record
     await prisma.courseUser.create({
         data: {
             userId: req.user.id,
@@ -143,7 +141,6 @@ const purchaseCourseHandler = async (req, res) => {
         },
     });
 
-    // If the course was in the cart, remove it
     await prisma.cartItem.deleteMany({
         where: {
             userId: req.user.id,

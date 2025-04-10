@@ -36,7 +36,6 @@ const CartPage = () => {
 
         setIsProcessing(true);
         try {
-            // Purchase each course in cart
             for (const item of cart) {
                 await axios.post(
                     `${process.env.SERVER_URL}/cart/purchase`,
@@ -125,7 +124,6 @@ const CartPage = () => {
                                     0,
                                 )}
                             </p>
-                            <p className="text-gray-500 mb-2">Shipping: Free</p>
                             <h3 className="text-lg font-semibold">
                                 Total: ₹
                                 {cart.reduce(
