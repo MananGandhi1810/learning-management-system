@@ -4,6 +4,7 @@ import authRouter from "./router/auth.js";
 import courseRouter from "./router/course.js";
 import cartRouter from "./router/cart.js";
 import reviewRouter from "./router/review.js";
+import paymentRouter from "./router/payment.js";
 import logger from "morgan";
 
 const app = express();
@@ -21,6 +22,7 @@ app.use("/auth", authRouter);
 app.use("/course", courseRouter);
 app.use("/cart", cartRouter);
 app.use("/reviews", reviewRouter);
+app.use("/payment", paymentRouter);
 
 app.use(function (req, res, next) {
     res.status(404).json({

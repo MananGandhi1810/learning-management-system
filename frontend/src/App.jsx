@@ -22,6 +22,7 @@ import CartPage from "./pages/CartPage";
 import MyCoursesPage from "./pages/MyCoursesPage";
 import CourseContentPage from "./pages/CourseContentPage";
 import VideoPlayerPage from "./pages/VideoPlayerPage";
+import PaymentPage from "./pages/PaymentPage";
 
 function App() {
     const initialState = {
@@ -231,6 +232,16 @@ function App() {
                         return null;
                     },
                     element: <VideoPlayerPage />,
+                },
+                {
+                    path: "/payment",
+                    loader: ({ request }) => {
+                        if (!user.isAuthenticated) {
+                            return redirect("/login?next=/payment");
+                        }
+                        return null;
+                    },
+                    element: <PaymentPage />,
                 },
                 {
                     path: "*",

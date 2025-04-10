@@ -21,6 +21,7 @@ model User {
     courses           CourseUser[]
     cartItems         CartItem[]
     reviews           Review[]
+    payments          Payment[]
 }
 
 model Course {
@@ -38,6 +39,7 @@ model Course {
     cartItem      CartItem[]   @relation(name: "CartItem")
     cartItemId    String?
     reviews       Review[]
+    payments      Payment[]
 
     @@index([slug])
 }
@@ -90,4 +92,21 @@ model Review {
 
     @@unique([userId, courseId])
     @@index([courseId])
+}
+
+model Payment {
+    id            String   @id @default(cuid())
+    amount        Float
+    currency      String   @default("INR")
+    status        String // "pending", "completed", "failed"
+    paymentMethod String   @default("card")
+    user          User     @relation(fields: [userId], references: [id])
+    userId        String
+    courseId      String?
+    course        Course?  @relation(fields: [courseId], references: [id])
+    transactionId String?  @unique
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    @@index([userId])
 }

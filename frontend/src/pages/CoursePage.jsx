@@ -145,8 +145,8 @@ function CoursePage() {
     const purchaseCourse = async () => {
         setIsProcessing(true);
         try {
-            const res = await axios.post(
-                `${process.env.SERVER_URL}/cart/purchase`,
+            const response = await axios.post(
+                `${process.env.SERVER_URL}/payment/initiate`,
                 { courseId: course.id },
                 {
                     headers: { Authorization: `Bearer ${user.token}` },
@@ -154,16 +154,16 @@ function CoursePage() {
                 },
             );
 
-            if (res.data.success) {
-                toast({
-                    title: "Purchase successful",
-                    description: "You now have access to this course",
+            if (response.data.success) {
+                navigate("/payment", {
+                    state: {
+                        paymentSession: response.data.data.paymentSession,
+                    },
                 });
-                navigate(`/my-courses/${course.slug}`);
             } else {
                 toast({
                     title: "Purchase failed",
-                    description: res.data.message,
+                    description: response.data.message,
                     variant: "destructive",
                 });
             }

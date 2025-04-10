@@ -36,23 +36,31 @@ const CartPage = () => {
 
         setIsProcessing(true);
         try {
-            for (const item of cart) {
-                await axios.post(
-                    `${process.env.SERVER_URL}/cart/purchase`,
-                    { courseId: item.id },
-                    {
-                        headers: { Authorization: `Bearer ${user.token}` },
-                        validateStatus: false,
+            // Initialize a bulk payment for all cart items
+            const response = await axios.post(
+                `${process.env.SERVER_URL}/payment/bulk/initiate`,
+                { cartItems: cart.map((item) => item.id) },
+                {
+                    headers: { Authorization: `Bearer ${user.token}` },
+                    validateStatus: false,
+                },
+            );
+
+            if (response.data.success) {
+                // Navigate to payment page with the payment session
+                navigate("/payment", {
+                    state: {
+                        paymentSession: response.data.data.paymentSession,
                     },
-                );
+                });
+            } else {
+                toast({
+                    title: "Checkout failed",
+                    description:
+                        response.data.message || "Failed to initiate payment",
+                    variant: "destructive",
+                });
             }
-
-            toast({
-                title: "Purchase successful",
-                description: "All courses have been added to your library",
-            });
-
-            navigate("/my-courses");
         } catch (error) {
             toast({
                 title: "Checkout failed",
