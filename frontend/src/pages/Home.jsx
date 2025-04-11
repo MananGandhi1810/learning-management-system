@@ -3,12 +3,14 @@ import { Button } from "@/components/ui/button";
 import React, { useContext } from "react";
 import { useLoaderData } from "react-router";
 import { Link } from "react-router-dom";
-import { BookOpen, CheckCircle, Zap, Sparkles } from "lucide-react";
+import { BookOpen, CheckCircle, Zap, Sparkles, ArrowRight } from "lucide-react";
 import AuthContext from "@/context/auth-provider";
 
 function Home() {
     const { courses } = useLoaderData();
     const { user } = useContext(AuthContext);
+
+    const shuffledCourses = [...courses].sort(() => Math.random() - 0.5);
 
     return (
         <div className="h-full w-screen overflow-hidden">
@@ -110,11 +112,11 @@ function Home() {
                             to="/courses"
                             className="text-primary hover:underline flex items-center gap-2 font-medium"
                         >
-                            View all courses <Zap size={16} />
+                            View all courses <ArrowRight size={16} />
                         </Link>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
-                        {courses.slice(0, 3).map((course) => (
+                        {shuffledCourses.slice(0, 3).map((course) => (
                             <CourseCard
                                 key={course.id}
                                 course={course}

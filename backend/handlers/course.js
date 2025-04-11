@@ -19,6 +19,9 @@ const getAllCoursesHandler = async (req, res) => {
                 ...(maxPrice && { lte: parseInt(maxPrice) }),
             },
         },
+        include: {
+            reviews: { select: { rating: true } },
+        },
     });
     res.json({
         success: true,
@@ -193,6 +196,7 @@ const getCourseHandler = async (req, res) => {
                     index: "desc",
                 },
             },
+            reviews: { select: { rating: true } },
         },
     });
 
